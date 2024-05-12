@@ -40,8 +40,7 @@ async function run() {
    app.post('/jwt', async (req, res) =>{
            const user = req.body;
            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '2h'})
-           res
-           .cookie('token', token, {
+           res.cookie('token', token, {
             httpOnly: true,
             secure: false,
             sameSite: 'none'
@@ -49,7 +48,13 @@ async function run() {
            .send({success: true});
    })
 
+  // POST
 
+  app.post("/add_food", async (req, res) => {
+    const foodData = req.body;
+    const result = await foodCollection.insertOne(foodData);
+    res.send(result);
+  });
 
 
     
@@ -57,7 +62,7 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    
   }
 }
 run().catch(console.dir);
