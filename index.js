@@ -7,10 +7,13 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const user = process.env.DB_USERNAME;
 const password = process.env.DB_PASSWORD;
-
+const cookieParser = require('cookie-parser');
 
 // ------- Middleware ----
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:5173'],
+    credentials: true
+}));
 app.use(express.json());
 
 
@@ -37,7 +40,13 @@ async function run() {
    app.post('/jwt', async (req, res) =>{
            const user = req.body;
            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '2h'})
-           res.send(token);
+           res
+           .cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'none'
+           })
+           .send({success: true});
    })
 
 
