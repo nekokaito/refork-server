@@ -74,10 +74,34 @@ async function run() {
   })
   app.get('/foods/request_food/:email', async (req, res) =>{
     const userEmail = req.params.email;
-    console.log(userEmail)
-    const result =  await requestCollection.find({user_email:userEmail}).toArray();
+   
+    const result =  await requestCollection.find({email:userEmail}).toArray();
     res.send(result);
   })
+  app.get('/manage_food/:email', async (req, res) =>{
+    const userEmail = req.params.email;
+    console.log(userEmail)
+    const result =  await foodCollection.find({user_email:userEmail}).toArray();
+    res.send(result);
+  })
+
+  app.get('/update/:id', async (req, res) => {
+    const id = req.params.id;
+    console.log(id)
+    const query = {_id: new ObjectId(id)}
+    console.log(query)
+    const result = await foodCollection.findOne(query);
+    res.send(result);
+  })
+  //Delete
+
+  app.delete('/foods/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)}
+    const result = await foodCollection.deleteOne(query);
+    res.send(result);
+  })
+ 
   
   //Update
 
@@ -91,8 +115,6 @@ async function run() {
         $set: {
           // food_name, notes, location, food_image, date, status, quantity, user_name, user_photo, user_email
           food_name: itemUpdated.food_name,
-          user_name: itemUpdated.user_name,
-          user_email: itemUpdated.user_email,
           notes : itemUpdated.notes,
           location: itemUpdated.location,
           food_image: itemUpdated.food_image,
