@@ -56,6 +56,33 @@ async function run() {
     res.send(result);
   });
 
+  //GET
+
+  
+  app.get('/foods', async (req, res) => {
+    const cursor = foodCollection.find();
+    const result = await cursor.toArray();
+    res.send(result)
+    
+  })
+
+   //Search 
+
+   const sanitizeSearch = (search) => {
+    return search.replace(/[^a-zA-Z0-9\s]/g, ''); 
+}
+   app.get("/foods_item", async (req, res) => {
+    const search = req.query.search;
+
+    const sanitizedSearch = sanitizeSearch(search);
+
+    let query = {
+      food_name: { $regex: sanitizedSearch, $options: "i" },
+    };
+
+    const result = await foodCollection.find(query).toArray();
+    res.send(result);
+  });
 
     
     await client.db("admin").command({ ping: 1 });
