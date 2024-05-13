@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
 const jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const user = process.env.DB_USERNAME;
 const password = process.env.DB_PASSWORD;
@@ -79,6 +79,33 @@ async function run() {
     res.send(result);
   })
   
+  //Update
+
+ app.put('/foods/:id', async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) }
+    const options = { upsert: true };
+    const itemUpdated = req.body;
+
+    const item = {
+        $set: {
+          // food_name, notes, location, food_image, date, status, quantity, user_name, user_photo, user_email
+          food_name: itemUpdated.food_name,
+          user_name: itemUpdated.user_name,
+          user_email: itemUpdated.user_email,
+          notes : itemUpdated.notes,
+          location: itemUpdated.location,
+          food_image: itemUpdated.food_image,
+          date: itemUpdated.date,
+          status: itemUpdated.status,
+          quantity: itemUpdated.quantity,
+          
+        }
+    }
+
+    const result = await foodCollection.updateOne(filter, item, options);
+    res.send(result);
+})
 
   
 
