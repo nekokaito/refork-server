@@ -80,7 +80,6 @@ async function run() {
   })
   app.get('/manage_food/:email', async (req, res) =>{
     const userEmail = req.params.email;
-    console.log(userEmail)
     const result =  await foodCollection.find({user_email:userEmail}).toArray();
     res.send(result);
   })
@@ -89,7 +88,6 @@ async function run() {
     const id = req.params.id;
     console.log(id)
     const query = {_id: new ObjectId(id)}
-    console.log(query)
     const result = await foodCollection.findOne(query);
     res.send(result);
   })
