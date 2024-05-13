@@ -34,6 +34,7 @@ async function run() {
     await client.connect();
 
    const foodCollection = client.db('ReFork').collection('food');
+   const requestCollection = client.db('ReFork').collection('food_request');
    
    //Auth
    
@@ -55,6 +56,12 @@ async function run() {
     const result = await foodCollection.insertOne(foodData);
     res.send(result);
   });
+  app.post("/request_food", async (req, res) => {
+    const foodData = req.body;
+    const result = await requestCollection.insertOne(foodData);
+    res.send(result);
+  });
+
 
   //GET
 
@@ -65,6 +72,15 @@ async function run() {
     res.send(result)
     
   })
+  app.get('/foods/request_food/:email', async (req, res) =>{
+    const userEmail = req.params.email;
+    console.log(userEmail)
+    const result =  await requestCollection.find({user_email:userEmail}).toArray();
+    res.send(result);
+  })
+  
+
+  
 
    //Search 
 
