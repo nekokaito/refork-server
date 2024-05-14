@@ -9,6 +9,25 @@ const user = process.env.DB_USERNAME;
 const password = process.env.DB_PASSWORD;
 const cookieParser = require('cookie-parser');
 
+const verifyJWT = (req, res, next) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+      return res.status(403).send('Token is required');
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+          return res.status(401).send('Invalid Token');
+      }
+      req.user = decoded;
+      next();
+  });
+ };
+
+
+
+
 // ------- Middleware ----
 app.use(cors({
     origin: ['http://localhost:5173'],
@@ -37,18 +56,19 @@ async function run() {
    const requestCollection = client.db('ReFork').collection('food_request');
    
    //Auth
-   
-   app.post('/jwt', async (req, res) =>{
-           const user = req.body;
-           const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '2h'})
-           res.cookie('token', token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'none'
-           })
-           .send({success: true});
-   })
-
+   app.post("/jwt", async (req, res) => {
+    try {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "3h",
+      });
+      res.send({ token });
+    } catch (error) {
+      console.error("Error generating JWT:", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+  
   // POST
 
   app.post("/add_food", async (req, res) => {
@@ -72,13 +92,14 @@ async function run() {
     res.send(result)
     
   })
-  app.get('/foods/request_food/:email', async (req, res) =>{
+  app.get('/foods/request_food/:email', verifyJWT, async (req, res) =>{
     const userEmail = req.params.email;
-   
+    
     const result =  await requestCollection.find({email:userEmail}).toArray();
     res.send(result);
   })
-  app.get('/manage_food/:email', async (req, res) =>{
+  app.get('/manage_food/:email', verifyJWT, async (req, res) =>{
+    
     const userEmail = req.params.email;
     const result =  await foodCollection.find({user_email:userEmail}).toArray();
     res.send(result);
