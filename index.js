@@ -30,7 +30,7 @@ const verifyJWT = (req, res, next) => {
 
 // ------- Middleware ----
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['https://refork-bd.web.app/'],
     credentials: true
 }));
 app.use(express.json());
@@ -50,7 +50,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     
-    await client.connect();
+    // await client.connect();
 
    const foodCollection = client.db('ReFork').collection('food');
    const requestCollection = client.db('ReFork').collection('food_request');
@@ -169,8 +169,8 @@ async function run() {
   });
 
     
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     
